@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIDS enhanced A320: Interactive Guide for Newcomers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: A single-page, vertically scrolling application with a fixed side navigation. This structure is chosen for its intuitive user flow, allowing users to either scroll sequentially or jump to specific topics. Key interactions include a clickable diagram for core components, accordion-style cards for system functions, and an animated diagram for the network, all designed to make the technical information more digestible and engaging for newcomers than a static document. -->
+    <!-- Visualization & Content Choices: 
+        - CIDS Components: Presented as an interactive diagram (HTML/CSS) where clicking a component reveals its details. Goal: Organize & Inform. Justification: More engaging than a static list.
+        - System Functions: Displayed in a grid of expandable cards (accordion style). Goal: Inform & Organize. Justification: Breaks down complex information into manageable, user-triggered chunks.
+        - System Network: Visualized with an animated HTML/CSS diagram showing data flow. Goal: Explain Relationships. Justification: A dynamic flow is more effective for explaining a network than a static image.
+        - No quantitative data exists in the source, so no charts are used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* neutral-50 */
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-link.active {
+            background-color: #e0f2fe; /* sky-100 */
+            color: #0284c7; /* sky-600 */
+            font-weight: 600;
+        }
+        .content-section {
+            padding-top: 4rem;
+            margin-top: -4rem;
+        }
+        .function-card.active {
+            border-color: #0ea5e9; /* sky-500 */
+            background-color: #f0f9ff; /* sky-50 */
+        }
+        .function-card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+        }
+        .function-card.active .function-card-content {
+            max-height: 500px; /* Adjust as needed */
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        #component-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+        }
+    </style>
+</head>
+<body class="text-gray-800 text-center">
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar" class="w-64 hidden lg:flex flex-col fixed top-0 left-0 h-full bg-white border-r border-gray-200 p-4">
+            <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">CIDS Guide</h2>
+            <ul class="space-y-2">
+                <li><a href="#welcome" class="nav-link block w-full text-center px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100">Welcome</a></li>
+                <li><a href="#components" class="nav-link block w-full text-center px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100">Components</a></li>
+                <li><a href="#passenger" class="nav-link block w-full text-center px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100">Passenger Services</a></li>
+                <li><a href="#crew" class="nav-link block w-full text-center px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100">Crew & Safety</a></li>
+                <li><a href="#network" class="nav-link block w-full text-center px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100">System Network</a></li>
+                <li><a href="#contact" class="nav-link block w-full text-center px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100">Expert Contacts</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-1 lg:ml-64 p-4 sm:p-6 md:p-10 relative">
+            <!-- Copy Code Button -->
+            <button id="copy-code-btn" class="absolute top-4 right-4 bg-sky-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-sky-700 transition flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                </svg>
+                Copy Code
+            </button>
+
+            <!-- Welcome Section -->
+            <section id="welcome" class="content-section mb-16">
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+                    <h1 class="text-4xl font-bold text-sky-700 mb-4 text-left">Welcome to the A320 enhanced CIDS!</h1>
+                    <h2 class="text-2xl text-gray-600 mb-4 text-left">An Interactive Guide to the Cabin Intercommunication Data System</h2>
+                    <div class="flex flex-col">
+                        <div class="w-full">
+                            <p class="text-lg mb-4 text-left">
+                                Think of the <strong class="font-semibold">Cabin Intercommunication Data System (CIDS)</strong> as the central nervous system of the aircraft cabin. It's a smart, digital system that connects, controls, and monitors nearly all the functions inside the cabin, from the lights and announcements you experience as a passenger to the communication and safety systems the crew relies on.
+                            </p>
+                            <div class="bg-sky-50 p-6 rounded-lg mb-6">
+                                <h3 class="font-semibold text-sky-800 text-lg mb-2 text-left">In simple terms, CIDS:</h3>
+                                <ul class="list-disc list-inside space-y-2 text-gray-700 text-left">
+                                    <li><strong class="font-semibold">Controls</strong> cabin lighting, signs, and passenger calls.</li>
+                                    <li><strong class="font-semibold">Manages</strong> communication between the cabin crew and the cockpit.</li>
+                                    <li><strong class="font-semibold">Monitors</strong> critical safety systems like smoke detectors.</li>
+                                    <li><strong class="font-semibold">Integrates</strong> various cabin systems into one intelligent network.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="w-full flex items-center justify-center">
+                            <img src="cids_block_diagram.png" alt="CIDS Block Diagram" class="rounded-lg shadow-md max-w-full h-auto lg:max-w-2xl transform rotate-90">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Components Section -->
+            <section id="components" class="content-section mb-16">
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+                    <h1 class="text-3xl font-bold text-sky-700 mb-2 text-center">Components</h1>
+                    <p class="text-lg text-gray-600 mb-8 text-center">CIDS is a team of components working together. Click on a component below to learn more about its role.</p>
+                    <div class="flex flex-col gap-8">
+                        <div id="component-buttons">
+                            <button data-component="director" class="component-btn text-center p-4 rounded-lg border-2 border-transparent bg-gray-100 hover:bg-gray-200 transition">
+                                <h3 class="font-semibold text-md">Director</h3>
+                            </button>
+                            <button data-component="fap" class="component-btn text-center p-4 rounded-lg border-2 border-transparent bg-gray-100 hover:bg-gray-200 transition">
+                                <h3 class="font-semibold text-md">FAP</h3>
+                            </button>
+                            <button data-component="deu-a" class="component-btn text-center p-4 rounded-lg border-2 border-transparent bg-gray-100 hover:bg-gray-200 transition">
+                                <h3 class="font-semibold text-md">DEU A</h3>
+                            </button>
+                            <button data-component="deu-b" class="component-btn text-center p-4 rounded-lg border-2 border-transparent bg-gray-100 hover:bg-gray-200 transition">
+                                <h3 class="font-semibold text-md">DEU B</h3>
+                            </button>
+                            <button data-component="pisa" class="component-btn text-center p-4 rounded-lg border-2 border-transparent bg-gray-100 hover:bg-gray-200 transition">
+                                <h3 class="font-semibold text-md">PISA</h3>
+                            </button>
+                            <button data-component="aap" class="component-btn text-center p-4 rounded-lg border-2 border-transparent bg-gray-100 hover:bg-gray-200 transition">
+                                <h3 class="font-semibold text-md">AAP</h3>
+                            </button>
+                             <button data-component="acp" class="component-btn text-center p-4 rounded-lg border-2 border-transparent bg-gray-100 hover:bg-gray-200 transition">
+                                <h3 class="font-semibold text-md">ACP</h3>
+                            </button>
+                             <button data-component="aip" class="component-btn text-center p-4 rounded-lg border-2 border-transparent bg-gray-100 hover:bg-gray-200 transition">
+                                <h3 class="font-semibold text-md">AIP</h3>
+                            </button>
+                             <button data-component="handset" class="component-btn text-center p-4 rounded-lg border-2 border-transparent bg-gray-100 hover:bg-gray-200 transition">
+                                <h3 class="font-semibold text-md">Handset</h3>
+                            </button>
+                             <button data-component="connection-box" class="component-btn text-center p-4 rounded-lg border-2 border-transparent bg-gray-100 hover:bg-gray-200 transition">
+                                <h3 class="font-semibold text-md">Connection Box</h3>
+                            </button>
+                             <button data-component="termination-box" class="component-btn text-center p-4 rounded-lg border-2 border-transparent bg-gray-100 hover:bg-gray-200 transition">
+                                <h3 class="font-semibold text-md">Termination Box</h3>
+                            </button>
+                            <button data-component="ipram" class="component-btn text-center p-4 rounded-lg border-2 border-transparent bg-gray-100 hover:bg-gray-200 transition">
+                                <h3 class="font-semibold text-md">IPRAM</h3>
+                            </button>
+                            <button data-component="cam" class="component-btn text-center p-4 rounded-lg border-2 border-transparent bg-gray-100 hover:bg-gray-200 transition">
+                                <h3 class="font-semibold text-md">CAM</h3>
+                            </button>
+                            <button data-component="obrm" class="component-btn text-center p-4 rounded-lg border-2 border-transparent bg-gray-100 hover:bg-gray-200 transition">
+                                <h3 class="font-semibold text-md">OBRM</h3>
+                            </button>
+                        </div>
+                        <div>
+                            <div id="component-display" class="bg-sky-50 p-6 rounded-lg min-h-[300px] flex flex-col justify-center transition-all duration-300">
+                                <div id="component-content" class="text-center">
+                                    <p class="text-gray-500">Select a component to see its details.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Passenger Comfort & Services Section -->
+            <section id="passenger" class="content-section mb-16">
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+                    <h1 class="text-3xl font-bold text-sky-700 mb-2 text-center">Passenger Comfort & Services</h1>
+                    <p class="text-lg text-gray-600 mb-8 text-center">CIDS manages all passenger-facing cabin systems to ensure a comfortable and pleasant flight.</p>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="function-card border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-sky-400 transition">
+                            <h3 class="font-semibold text-lg">📢 Passenger Address & Audio</h3>
+                            <div class="function-card-content text-gray-700 text-left">The passenger address function does the distribution of announcements from the cockpit and each attendant station through all assigned PAX loudspeakers. CIDS also transmits pre-recorded announcements and boarding music (PRAM) and interfaces with the Passenger Entertainment System (PES).</div>
+                        </div>
+                        <div class="function-card border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-sky-400 transition">
+                            <h3 class="font-semibold text-lg">💡 Cabin & Reading Lights</h3>
+                            <div class="function-card-content text-gray-700 text-left">The Cabin illumination function controls the illumination in the different cabin areas independently. The reading lights function controls the passenger reading lights and attendant work lights in the cabin.</div>
+                        </div>
+                        <div class="function-card border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-sky-400 transition">
+                            <h3 class="font-semibold text-lg">🙋 Passenger Calls & Services</h3>
+                            <div class="function-card-content text-gray-700 text-left">The passenger call function controls the visual indication of passenger calls to assigned attendant stations. The Passenger Service System (PSS) is used for remote controlled operation of the passenger reading lights and the passenger call activation/deactivation.</div>
+                        </div>
+                        <div class="function-card border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-sky-400 transition">
+                            <h3 class="font-semibold text-lg">🚭 Passenger Lighted Signs</h3>
+                            <div class="function-card-content text-gray-700 text-left">This function controls the operation of the usually installed passenger lighted signs: No Smoking (NS), Fasten Seat Belt (FSB), Return to Seat (RTS) and EXIT Signs. It is also possible to install Portable Electronic Devices (PED) or GSM (No Mobile) signs instead of NS Signs.</div>
+                        </div>
+                        <div class="function-card border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-sky-400 transition">
+                            <h3 class="font-semibold text-lg">🌡️ Air Conditioning</h3>
+                            <div class="function-card-content text-gray-700 text-left">The CIDS can indicate different temperatures for all defined cabin zones. It is possible to do a fine adjustment of the preselected temperature for different cabin zones from the FAP.</div>
+                        </div>
+                         <div class="function-card border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-sky-400 transition">
+                            <h3 class="font-semibold text-lg">💧 Water & Waste System</h3>
+                            <div class="function-card-content text-gray-700 text-left">The potable water function shows the filling level of the fresh water tank and allows pre-selection of the quantity. The waste indication shows the filling level of the waste tanks. The Vacuum System Control Function (VSCF) controls and monitors the Vacuum Toilet System.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Crew Operations & Safety Section -->
+            <section id="crew" class="content-section mb-16">
+                 <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+                    <h1 class="text-3xl font-bold text-red-700 mb-2 text-center">Crew Operations & Safety</h1>
+                    <p class="text-lg text-gray-600 mb-8 text-center">The primary role of CIDS is to provide the crew with the tools they need to ensure a safe and efficient flight.</p>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="function-card border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-red-400 transition">
+                            <h3 class="font-semibold text-lg">📞 Interphone Systems</h3>
+                            <div class="function-card-content text-gray-700 text-left">The cabin interphone function allows telephone communication on-board point to point or between all attendant stations including the cockpit. The service interphone function allows communication between ground crew, cockpit crew and cabin crew when the A/C is on ground.</div>
+                        </div>
+                        <div class="function-card border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-red-400 transition">
+                            <h3 class="font-semibold text-lg">🔥 Smoke Detection</h3>
+                            <div class="function-card-content text-gray-700 text-left">This function allows the detection of smoke in Lavatories and Cargo Compartments, and provides immediate visual and acoustical indications in the cabin, on the FAP and in the Cockpit. It also monitors the cargo fire extinguisher bottles.</div>
+                        </div>
+                        <div class="function-card border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-red-400 transition">
+                            <h3 class="font-semibold text-lg">🆘 Emergency Evacuation (EVAC)</h3>
+                            <div class="function-card-content text-gray-700 text-left">The EVAC system controls the evacuation signaling in all cabin areas and the cockpit. It can be activated from the cockpit or FAP during an emergency evacuation.</div>
+                        </div>
+                        <div class="function-card border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-red-400 transition">
+                            <h3 class="font-semibold text-lg">🚪 Doors & Slides Monitoring</h3>
+                            <div class="function-card-content text-gray-700 text-left">CIDS indicates the door and escape-slide bottle-pressure reservoir of the passenger doors and emergency exits. In addition it indicates the status of the doors (open/closed) and escape-slides (armed/disarmed).</div>
+                        </div>
+                         <div class="function-card border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-red-400 transition">
+                            <h3 class="font-semibold text-lg">✅ Cabin Status & Alerts</h3>
+                            <div class="function-card-content text-gray-700 text-left">The "Cabin Ready" signaling is used to inform the cockpit crew about the cabin status for take-off and landing. The "Sterile Cockpit" command is used by the flight crew to indicate they do not wish to be disturbed. A Cabin/Cockpit Alerting system is also available for security incidents.</div>
+                        </div>
+                        <div class="function-card border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-red-400 transition">
+                            <h3 class="font-semibold text-lg">🛠️ System Monitoring (BITE)</h3>
+                            <div class="function-card-content text-gray-700 text-left">The CIDS is designed to continuously monitor its own performance and that of connected equipment like the Emergency Power Supply Units (EPSU) and Drain Masts. The Built-In Test Equipment (BITE) detects and stores faults for maintenance.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- System Network Section -->
+            <section id="network" class="content-section mb-16">
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+                    <h1 class="text-3xl font-bold text-sky-700 mb-2 text-center">The CIDS Network</h1>
+                    <p class="text-lg text-gray-600 mb-6 text-center">CIDS uses dedicated data busses to ensure reliable communication between components. Toggle between the different network lines to see how information flows.</p>
+                    
+                    <div class="flex flex-wrap justify-center gap-4 mb-8">
+                        <button id="btn-top-line" class="network-btn px-6 py-2 rounded-lg font-semibold text-white bg-sky-600 shadow-sm">Top Line (Passenger)</button>
+                        <button id="btn-middle-line" class="network-btn px-6 py-2 rounded-lg font-semibold bg-gray-200 text-gray-700">Middle Line (Crew)</button>
+                        <button id="btn-fap-line" class="network-btn px-6 py-2 rounded-lg font-semibold bg-gray-200 text-gray-700">FAP Connection</button>
+                    </div>
+
+                    <div id="network-diagram-container" class="bg-gray-100 p-6 rounded-lg">
+                        <!-- JS will populate this area -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section id="contact" class="content-section">
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+                    <h1 class="text-3xl font-bold text-sky-700 mb-2 text-center">Expert Contacts</h1>
+                    <p class="text-lg text-gray-600 mb-6 text-center">If you have further questions or require expert assistance, please contact:</p>
+                    <div class="grid md:grid-cols-2 gap-6 mt-6">
+                        <div class="bg-gray-100 p-6 rounded-lg">
+                            <h3 class="font-semibold text-gray-800 text-lg mb-2">Ovidiu DEFTU</h3>
+                            <p class="text-gray-600">ovidiu.deftu@airbus.com</p>
+                        </div>
+                        <div class="bg-gray-100 p-6 rounded-lg">
+                            <h3 class="font-semibold text-gray-800 text-lg mb-2">Carsten MEIER</h3>
+                            <p class="text-gray-600">carsten.meier@airbus.com</p>
+                        </div>
+                    </div>
+                     <div class="mt-8 text-center">
+                        <a href="https://docs.google.com/document/d/11if4aR9g8oSNMn9oajjHgS6YzV70b_K6Xq_zBAtBbDs/edit?usp=sharing" target="_blank" class="text-sky-600 hover:text-sky-800 hover:underline">For more information, consult the full training manual.</a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const componentData = {
+                director: {
+                    title: 'CIDS Directors',
+                    text: "The two Directors are the central computers of the CIDS. For maximum reliability, one is always active while the other is in a 'hot-standby' mode, ready to take over instantly in case of a failure. They process all system inputs and commands.",
+                    img: 'director.png'
+                },
+                fap: {
+                    title: 'Flight Attendant Panel (FAP)',
+                    text: "The FAP is a touchscreen interface, usually at the front of the cabin, that serves as the main control center for the cabin crew. From here, they can manage lighting, make announcements, monitor doors and slides, and access system tests.",
+                    img: 'fap.png'
+                },
+                'deu-a': {
+                    title: 'Decoder/Encoder Unit A (DEU A)',
+                    text: "DEU-A units manage passenger-related items. They are connected to the Top Line data bus and control components like passenger signs, cabin illumination, and the Passenger Service Units (PSUs).",
+                    img: 'DEU-A.png'
+                },
+                 'deu-b': {
+                    title: 'Decoder/Encoder Unit B (DEU B)',
+                    text: "DEU-B units manage crew and safety systems. They are connected to the Middle Line data bus and interface with handsets, Area Call Panels (ACPs), Attendant Indication Panels (AIPs), and smoke detectors.",
+                    img: 'DEU-B.png'
+                },
+                pisa: {
+                    title: 'Passenger Interface and Supply Adapter (PISA)',
+                    text: "The PISA is an interface between the DEU-A and the components of the Passenger Service Unit (PSU), such as reading lights, call buttons, and loudspeakers.",
+                    img: 'PISA.png'
+                },
+                aap: {
+                    title: 'Additional Attendant Panel (AAP)',
+                    text: "An optional panel, typically in the aft cabin, that provides crew with additional control over functions like lighting, calls, and evacuation signals.",
+                    img: 'AAP.png'
+                },
+                acp: {
+                    title: 'Area Call Panel (ACP)',
+                    text: "ACPs provide long-range visual indication of calls or alerts using colored lights (e.g., blue for passenger call, amber for lavatory call, pink for crew call).",
+                    img: 'ACP.png'
+                },
+                aip: {
+                    title: 'Attendant Indication Panel (AIP)',
+                    text: "Located at each attendant station, the AIP has an alphanumeric display that shows detailed information about calls (e.g., seat number), interphone status, and system messages.",
+                    img: 'AIP.png'
+                },
+                handset: {
+                    title: 'Handset',
+                    text: "Used by cabin crew for PA announcements and interphone communication. It includes a keypad for dialing and selecting functions.",
+                    img: 'Handset.png'
+                },
+                'connection-box': {
+                    title: 'Connection Box',
+                    text: "DEUs are connected to the data bus lines via connection boxes. Each box uses coding switches to give the connected DEU a unique address.",
+                    img: 'Connection_box.png'
+                },
+                'termination-box': {
+                    title: 'Termination Box',
+                    text: "The Termination Box is the last Connection Box on a data bus line. It includes a termination resistor for impedance matching, which prevents signal reflections and ensures clear communication on the network.",
+                    img: 'Connection_box.png'
+                },
+                ipram: {
+                    title: 'Integrated PRAM (IPRAM)',
+                    text: "The integrated Pre-Recorded Announcement and Boarding Music is a removable memory card which stores audio data. It is installed in the sub panel of the FAP.",
+                    img: 'IPRAM.png'
+                },
+                cam: {
+                    title: 'Cabin Assignment Module (CAM)',
+                    text: "The CAM is a plug-in memory card which defines many of the system properties and all cabin layout and zoning information. Changes to these properties usually require the replacement of the CAM.",
+                    img: 'CAM.png'
+                },
+                obrm: {
+                    title: 'On Board Replaceable Module (OBRM)',
+                    text: "The OBRM is a removable memory card which contains the system software. Major changes of the CIDS functions are done by the replacement of the OBRM.",
+                    img: 'OBRM.png'
+                }
+            };
+
+            const componentBtns = document.querySelectorAll('.component-btn');
+            const componentDisplay = document.getElementById('component-display');
+            const componentContent = document.getElementById('component-content');
+
+            componentBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const componentKey = btn.dataset.component;
+                    const data = componentData[componentKey];
+
+                    componentContent.innerHTML = `
+                        <img src="${data.img}" alt="${data.title}" class="mx-auto mb-4 rounded-lg shadow-md max-h-48">
+                        <h3 class="font-bold text-xl mb-2 text-gray-800">${data.title}</h3>
+                        <p class="text-gray-700 text-left">${data.text}</p>
+                    `;
+                    
+                    componentBtns.forEach(b => b.classList.remove('bg-sky-100', 'border-sky-500'));
+                    btn.classList.add('bg-sky-100', 'border-sky-500');
+                });
+            });
+            
+            if (componentBtns.length > 0) {
+                componentBtns[0].click();
+            }
+
+            const functionCards = document.querySelectorAll('.function-card');
+            functionCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    card.classList.toggle('active');
+                });
+            });
+
+            const btnTopLine = document.getElementById('btn-top-line');
+            const btnMiddleLine = document.getElementById('btn-middle-line');
+            const btnFapLine = document.getElementById('btn-fap-line');
+            const networkDiagramContainer = document.getElementById('network-diagram-container');
+            const allNetworkBtns = [btnTopLine, btnMiddleLine, btnFapLine];
+
+            function setNetworkView(type) {
+                allNetworkBtns.forEach(btn => {
+                    btn.classList.remove('bg-sky-600', 'bg-red-600', 'bg-purple-600', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                });
+
+                let diagramHTML = '';
+
+                if (type === 'top') {
+                    btnTopLine.classList.add('bg-sky-600', 'text-white');
+                    btnTopLine.classList.remove('bg-gray-200', 'text-gray-700');
+                    diagramHTML = `
+                        <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center">
+                            <div class="flex flex-col items-center">
+                                <img src="director.png" class="h-20 w-auto rounded mb-2">
+                                <div class="p-2 bg-gray-800 text-white rounded-lg text-sm">CIDS Directors</div>
+                            </div>
+                            <div class="text-2xl font-bold text-gray-400 transform md:rotate-0 rotate-90">&rarr;</div>
+                            <div class="flex flex-col items-center">
+                                <div class="p-2 h-20 flex items-center justify-center font-semibold text-sky-700">Top Line Data Bus</div>
+                            </div>
+                            <div class="text-2xl font-bold text-gray-400 transform md:rotate-0 rotate-90">&rarr;</div>
+                            <div class="flex flex-col items-center">
+                                <img src="DEU-A.png" class="h-20 w-auto rounded mb-2">
+                                <div class="p-2 bg-sky-200 text-sky-800 rounded-lg text-sm">DEU-A</div>
+                            </div>
+                            <div class="text-2xl font-bold text-gray-400 transform md:rotate-0 rotate-90">&rarr;</div>
+                            <div class="flex flex-col items-center">
+                                <img src="PISA.png" class="h-20 w-auto rounded mb-2">
+                                <div class="p-2 bg-sky-200 text-sky-800 rounded-lg text-sm">PSU / Lights</div>
+                            </div>
+                        </div>
+                    `;
+                } else if (type === 'middle') {
+                    btnMiddleLine.classList.add('bg-red-600', 'text-white');
+                    btnMiddleLine.classList.remove('bg-gray-200', 'text-gray-700');
+                    diagramHTML = `
+                        <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center">
+                            <div class="flex flex-col items-center">
+                                <img src="director.png" class="h-20 w-auto rounded mb-2">
+                                <div class="p-2 bg-gray-800 text-white rounded-lg text-sm">CIDS Directors</div>
+                            </div>
+                            <div class="text-2xl font-bold text-gray-400 transform md:rotate-0 rotate-90">&rarr;</div>
+                            <div class="flex flex-col items-center">
+                                <div class="p-2 h-20 flex items-center justify-center font-semibold text-red-700">Middle Line Data Bus</div>
+                            </div>
+                            <div class="text-2xl font-bold text-gray-400 transform md:rotate-0 rotate-90">&rarr;</div>
+                            <div class="flex flex-col items-center">
+                                <img src="DEU-B.png" class="h-20 w-auto rounded mb-2">
+                                <div class="p-2 bg-red-200 text-red-800 rounded-lg text-sm">DEU-B</div>
+                            </div>
+                            <div class="text-2xl font-bold text-gray-400 transform md:rotate-0 rotate-90">&rarr;</div>
+                            <div class="flex flex-col items-center">
+                                <img src="Handset.png" class="h-20 w-auto rounded mb-2">
+                                <div class="p-2 bg-red-200 text-red-800 rounded-lg text-sm">Handset / AIP</div>
+                            </div>
+                        </div>
+                    `;
+                } else if (type === 'fap') {
+                    btnFapLine.classList.add('bg-purple-600', 'text-white');
+                    btnFapLine.classList.remove('bg-gray-200', 'text-gray-700');
+                    diagramHTML = `
+                        <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center">
+                            <div class="flex flex-col items-center">
+                                <img src="director.png" class="h-20 w-auto rounded mb-2">
+                                <div class="p-2 bg-gray-800 text-white rounded-lg text-sm">CIDS Directors</div>
+                            </div>
+                            <div class="text-2xl font-bold text-gray-400 transform md:rotate-0 rotate-90">&rarr;</div>
+                            <div class="flex flex-col items-center">
+                                 <div class="p-2 h-20 flex items-center justify-center font-semibold text-purple-700">Ethernet</div>
+                            </div>
+                            <div class="text-2xl font-bold text-gray-400 transform md:rotate-0 rotate-90">&rarr;</div>
+                            <div class="flex flex-col items-center">
+                                <img src="fap.png" class="h-20 w-auto rounded mb-2">
+                                <div class="p-2 bg-purple-200 text-purple-800 rounded-lg text-sm">FAP</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                networkDiagramContainer.innerHTML = diagramHTML;
+            }
+            
+            setNetworkView('top'); // Set initial view
+
+            btnTopLine.addEventListener('click', () => setNetworkView('top'));
+            btnMiddleLine.addEventListener('click', () => setNetworkView('middle'));
+            btnFapLine.addEventListener('click', () => setNetworkView('fap'));
+
+            const sections = document.querySelectorAll('.content-section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            if(navLinks.length > 0) {
+                navLinks[0].classList.add('active');
+            }
+            
+            const copyBtn = document.getElementById('copy-code-btn');
+            copyBtn.addEventListener('click', () => {
+                const codeToCopy = document.documentElement.outerHTML;
+                const textarea = document.createElement('textarea');
+                textarea.value = codeToCopy;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                copyBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Copied!
+                `;
+                setTimeout(() => {
+                     copyBtn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                            <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                        </svg>
+                        Copy Code
+                    `;
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
